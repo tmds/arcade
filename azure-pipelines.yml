@@ -50,7 +50,7 @@ jobs:
           name: NetCorePublic-Int-Pool
           queue: BuildPool.Windows.10.Amd64.VS2017.Open
         ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-          name: NetCoreInternal-Int-Pool
+          name: NetCoreInternal-Pool
           queue: BuildPool.Windows.10.Amd64.VS2017
       variables:
       - _Script: eng\common\cibuild.cmd
@@ -125,7 +125,7 @@ jobs:
             name:  NetCorePublic-Int-Pool
             queue: BuildPool.Ubuntu.1604.Amd64.Open
           ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-            name:  NetCoreInternal-Int-Pool
+            name:  NetCoreInternal-Pool
             queue: BuildPool.Ubuntu.1604.Amd64
         variables:
         - HelixApiAccessToken: ''
