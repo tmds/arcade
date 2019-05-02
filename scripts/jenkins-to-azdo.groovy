@@ -178,22 +178,51 @@ def processScript(def script) {
 	}
 }
 
-def processPublishStep(FreeStyleProject, def step, def out) {
+def processPublishStep(FreeStyleProject proj, def step, def out) {
 	if (step instanceof hudson.plugins.ws_cleanup.WsCleanup) {
 		return null
 	} else if (step instanceof hudson.plugins.repro_tool.ReproToolPublisher) {
 		return null
 	} else if (step instanceof org.jenkinsci.plugins.xunit.XUnitPublisher) {
-		def testDataPublishers = step.getTestDataPublishers()
+		def testDataPublishers = step.getTypes()
+		assert testDataPublishers.length == 1
+		def testDataPub = testDataPublishers[0]
 		def glob = ""
 		def format = ""
-		testDataPublishers.each { tdp ->
+		if (testDataPub instanceof org.jenkinsci.plugins.xunit.types.MSTestJunitHudsonTestType) {
+			glob = testDataPub.getPattern()
+			format = "VSTest"
+		} else {
+			out.println("Unknown test data type ${testDataPub.getClass()}")
+		}
+		 { tdp ->
 			out.println(tdp)
 		}
 		return """- task: PublishTestResults@2
   inputs:
     testResultsFormat: ${format}
 	testResultsFiles: ${glob}"""
+	} else if (step org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher) {
+		def worstResult = step.getWorstResult()
+		def bestResult = step.getBestResult()
+		def publisherList = step.getPublisherList()
+		assert publisherList.size() == 1
+		def publisher = publisherList[0]
+		if (publisher instanceof hudson.tasks.ArtifactArchiver) {
+			// Preserve the conditional nature of the archiving, though
+			// a lot of times this was done to save disk space
+			return """- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop"""
+		}
+	} else if (step instanceof com.chikli.hudson.plugin.naginator.NaginatorPublisher) {
+		return null
+	} else if (step instanceof org.jenkins_ci.plugins.flexible_publish.FlexiblePublisher) {	
+		def flexiblePublishers = step.getPublishers()
+		assert flexiblePublishers.size() == 1
+		def publisher = flexiblePublishers[0]
+		return processBuildStep(proj, publisher, out)
 	} else {
 		out.println("Unknown step type ${step.getClass()}")
 		assert false
