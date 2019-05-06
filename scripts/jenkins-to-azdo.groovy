@@ -1,7 +1,7 @@
 import hudson.tasks.*;
 import org.jenkinsci.plugins.ghprb.GhprbTrigger
 
-def folder = Jenkins.instance.getItemByFullName("/dotnet_symreader/release_1.3.0/")
+def folder = Jenkins.instance.getItemByFullName("/Microsoft_msbuild/vs15.9/")
 
 def newAzdoDef = processFolder(folder, out);
 println("=====================================")
@@ -48,8 +48,10 @@ def translateLabel(AbstractProject item, def out) {
         case "ubuntu1404-20180321":
         case "ubuntu1404-20170120":
         case "centos71-20171005":
+        case "ubuntu1604-20170731":
             return "vmImage: ubuntu-16.04"
         case "osx-10.12 || OSX.1012.Amd64.Open":
+        case "osx-10.13 || OSX.1013.Amd64.Open":
             return "vmImage: macOS-10.13"
         case "win2012-20180911":
         case "win2016-20170919":
