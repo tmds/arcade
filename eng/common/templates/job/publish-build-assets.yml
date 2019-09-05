@@ -55,7 +55,7 @@ jobs:
       displayName: Publish Build Assets
       inputs:
         filePath: eng\common\sdk-task.ps1
-        arguments: -task PublishBuildAssets -restore -msbuildEngine dotnet
+        arguments: -task PublishBuildAssets -restore -logsAzdoContainer '$(Agent.Os)_$(Agent.JobName)' -binlogArtifactName 'PublishToBAR' -msbuildEngine dotnet
           /p:ManifestsPath='$(Build.StagingDirectory)/Download/AssetManifests'
           /p:BuildAssetRegistryToken=$(MaestroAccessToken)
           /p:MaestroApiEndpoint=https://maestro-prod.westus2.cloudapp.azure.com

@@ -4,6 +4,8 @@ Param(
   [string] $task,
   [string] $verbosity = "minimal",
   [string] $msbuildEngine = $null,
+  [string] $binlogArtifactName = $null,
+  [string] $logsAzdoContainer = $null,
   [switch] $restore,
   [switch] $prepareMachine,
   [switch] $help,
@@ -31,18 +33,26 @@ function Print-Usage() {
   Write-Host "Command line arguments not listed above are passed thru to msbuild."
 }
 
-function Build([string]$target) {
+function Build([string]$target, [string]$logsAzdoContainer, [string]$binlogArtifactName) {
   $logSuffix = if ($target -eq "Execute") { "" } else { ".$target" }
   $log = Join-Path $LogDir "$task$logSuffix.binlog"
   $outputPath = Join-Path $ToolsetDir "$task\\"
 
-  MSBuild $taskProject `
-    /bl:$log `
-    /t:$target `
-    /p:Configuration=$configuration `
-    /p:RepoRoot=$RepoRoot `
-    /p:BaseIntermediateOutputPath=$outputPath `
-    @properties
+  try {
+    MSBuild $taskProject `
+      /bl:$log `
+      /t:$target `
+      /p:Configuration=$configuration `
+      /p:RepoRoot=$RepoRoot `
+      /p:BaseIntermediateOutputPath=$outputPath `
+      @properties
+  }
+  finally {
+    if (($null -ne $binlogArtifactName -and $binlogArtifactName -ne "") -and ($null -ne $logsAzdoContainer -and $logsAzdoContainer -ne "")) {
+      $finalArtifactName = "$task$logSuffix-$binlogArtifactName.binlog"
+      Write-PipelinePublishArtifact -ArtifactSourcePath $log -TargetContainer $logsAzdoContainer -TargetArtifactName $finalArtifactName
+    }
+  }
 }
 
 try {
@@ -64,10 +74,10 @@ try {
   }
 
   if ($restore) {
-    Build "Restore"
+    Build "Restore" $logsAzdoContainer $binlogArtifactName
   }
 
-  Build "Execute"
+  Build "Execute" $logsAzdoContainer $binlogArtifactName
 }
 catch {
   Write-Host $_

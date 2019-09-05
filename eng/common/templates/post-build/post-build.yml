@@ -59,7 +59,7 @@ stages:
           displayName: Validate
           inputs:
             filePath: eng\common\sdk-task.ps1
-            arguments: -task SigningValidation -restore -msbuildEngine dotnet
+            arguments: -task SigningValidation -restore -logsAzdoContainer '$(Agent.Os)_$(Agent.JobName)' -binlogArtifactName 'ValidateSigning' -msbuildEngine dotnet
               /p:PackageBasePath='$(Build.ArtifactStagingDirectory)/PackageArtifacts'
               /p:SignCheckExclusionsFile='$(Build.SourcesDirectory)/eng/SignCheckExclusionsFile.txt'
               /p:Configuration=Release 
