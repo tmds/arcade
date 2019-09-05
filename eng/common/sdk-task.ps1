@@ -72,10 +72,10 @@ try {
   }
 
   if ($restore) {
-    Build "Restore" $binlogSuffix
+    Build "Restore" -binlogSuffix $binlogSuffix -logFolder $logFolder
   }
 
-  Build "Execute" $binlogSuffix
+  Build "Execute" -binlogSuffix $binlogSuffix -logFolder $logFolder
 }
 catch {
   Write-Host $_
