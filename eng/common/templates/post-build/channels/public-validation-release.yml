@@ -59,7 +59,7 @@ stages:
           AZURE_DEVOPS_EXT_PAT: $(dn-bot-dnceng-universal-packages-rw)
         inputs:
           filePath: eng\common\sdk-task.ps1
-          arguments: -task PublishArtifactsInManifest -restore -logsAzdoContainer '$(Agent.Os)_$(Agent.JobName)' -binlogArtifactName 'PublishToValidationChannel' -msbuildEngine dotnet 
+          arguments: -task PublishArtifactsInManifest -restore -binlogSuffix 'PublishToValidationChannel' -logFolder '$(Agent.Os)_$(Agent.JobName)' -msbuildEngine dotnet 
             /p:ArtifactsCategory=$(_DotNetValidationArtifactsCategory)
             /p:IsStableBuild=$(IsStableBuild)
             /p:IsInternalBuild=$(IsInternalBuild)
