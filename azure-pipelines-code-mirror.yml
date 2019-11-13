@@ -43,6 +43,14 @@ jobs:
         displayName: Hard reset local branch to GitHub branch
         workingDirectory: $(WorkingDirectoryName)
       - script: |
-          git push azdo-mirror $(BranchToMirror) $(ExtraPushArgs)
+          $secondsBeforeRetry = 1
+          do {
+              if ($secondsBeforeRetry -gt 1) {
+                Write-Host "Retrying in $secondsBeforeRetry"
+                sleep $secondsBeforeRetry
+              }
+              $secondsBeforeRetry *= 2
+              git push azdo-mirror $(BranchToMirror) $(ExtraPushArgs)
+          } while (!$? -and $secondsBeforeRetry -lt 130)
         displayName: Push changes to Azure DevOps repo
         workingDirectory: $(WorkingDirectoryName)
